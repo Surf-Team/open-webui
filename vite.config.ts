@@ -22,7 +22,19 @@ export default defineConfig({
 		APP_BUILD_HASH: JSON.stringify(process.env.APP_BUILD_HASH || 'dev-build')
 	},
 	build: {
-		sourcemap: true
+		// вот так будет ещё лучше
+		// sourcemap: process.env.NODE_ENV !== 'production', // Генерируйте карты только в режиме разработки
+		sourcemap: false,
+		minify: 'terser',
+		rollupOptions: {
+			output: {
+				manualChunks(id) {
+					if (id.includes('node_modules')) {
+						return id.split('node_modules/')[1].split('/')[0].toString(); // Разделите зависимости по модулю
+					}
+				}
+			}
+		}		
 	},
 	worker: {
 		format: 'es'
